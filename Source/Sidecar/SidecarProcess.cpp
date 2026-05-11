@@ -298,15 +298,24 @@ namespace sp
     juce::StringArray SidecarProcess::getDefaultCommand()
     {
         auto exe = juce::File::getSpecialLocation (juce::File::currentExecutableFile);
+        const auto exeDir = exe.getParentDirectory();
 
        #if JUCE_WINDOWS
-        auto binary = exe.getParentDirectory().getChildFile ("practiceml.exe");
+        const juce::String binaryName = "practiceml.exe";
        #else
-        auto binary = exe.getParentDirectory().getChildFile ("practiceml");
+        const juce::String binaryName = "practiceml";
        #endif
 
-        if (binary.existsAsFile())
-            return { binary.getFullPathName() };
+        // PyInstaller's --onedir output is a directory containing the exe + _internal/.
+        // The installer drops that whole dir at <host-dir>/practiceml/, so probe both
+        // <host-dir>/practiceml<.exe>   (one-file build, if we ever switch)
+        // <host-dir>/practiceml/practiceml<.exe>  (one-dir bundle — current shipping layout)
+        for (const auto& candidate : { exeDir.getChildFile (binaryName),
+                                       exeDir.getChildFile ("practiceml").getChildFile (binaryName) })
+        {
+            if (candidate.existsAsFile())
+                return { candidate.getFullPathName() };
+        }
 
         // Dev fallback: walk up looking for sidecar/. Prefer the venv interpreter
         // (.venv/Scripts/python.exe on Windows, .venv/bin/python on Unix) so ML deps
