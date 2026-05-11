@@ -1,0 +1,25 @@
+[project]
+name = "practiceml"
+version = "0.1.0"
+description = "ML sidecar for SingingPractice (Demucs / basic-pitch / yt-dlp)"
+requires-python = ">=3.10"
+
+# Use requirements.txt for the actual install procedure; pyproject.toml's
+# dependency resolver can't satisfy basic-pitch's old tensorflow / resampy pins
+# on Python 3.13. See ../README.md for the explicit pip sequence.
+dependencies = [
+    "demucs>=4.0.1",
+    "yt-dlp>=2026.3.17",
+    "soundfile>=0.13.0",
+]
+
+[project.optional-dependencies]
+build = ["pyinstaller>=6.0"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["practiceml*"]
