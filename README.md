@@ -73,10 +73,7 @@ The simplest path — grab the latest Windows installer from
 [GitHub Releases](https://github.com/VanKyle00/SingingPracticeTool/releases):
 
 1. Download `SingingPracticeTool-Setup-<version>.exe`.
-2. Run it. The installer is per-user (no admin prompt), drops the app into
-   `%LocalAppData%\Programs\SingingPracticeTool\`, and adds a Start menu
-   shortcut.
-3. First launch creates `%APPDATA%\SingingPracticeTool\` for device settings
+2. First launch creates `%APPDATA%\SingingPracticeTool\` for device settings
    and `~\Music\SingingPracticeTool\` for recordings / stems / MIDI.
 
 > The installer is unsigned, so Windows SmartScreen will show "Microsoft
