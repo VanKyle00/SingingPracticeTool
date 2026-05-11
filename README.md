@@ -65,7 +65,32 @@ routing.
   on both sides so unicode filenames survive a YouTube → Stem → Vocal→MIDI
   round-trip.
 
-## Prerequisites (Windows)
+## Install
+
+The simplest path — grab the latest Windows installer from
+[GitHub Releases](https://github.com/VanKyle00/SingingPracticeTool/releases):
+
+1. Download `SingingPracticeTool-Setup-<version>.exe`.
+2. Run it. The installer is per-user (no admin prompt), drops the app into
+   `%LocalAppData%\Programs\SingingPracticeTool\`, and adds a Start menu
+   shortcut.
+3. First launch creates `%APPDATA%\SingingPracticeTool\` for device settings
+   and `~\Music\SingingPracticeTool\` for recordings / stems / MIDI.
+
+> The installer is unsigned, so Windows SmartScreen will show "Microsoft
+> Defender prevented an unrecognized app from starting" on first run. Click
+> **More info** → **Run anyway**. Code signing is on the roadmap.
+
+If you want CUDA-accelerated stem separation / vocal-to-MIDI, install a recent
+NVIDIA driver — the bundled PyTorch + ONNX Runtime detect CUDA at runtime and
+fall back to CPU automatically.
+
+## Build from source
+
+Building yourself only makes sense if you want to modify the code. For
+everyday use, the installer above is faster.
+
+### Prerequisites (Windows)
 
 1. **Visual Studio 2022 Build Tools** (or full VS) with the *Desktop
    development with C++* workload — provides MSVC + Windows SDK.
@@ -81,12 +106,10 @@ routing.
 5. **NVIDIA GPU + recent driver** — optional, only if you want CUDA-accelerated
    Demucs / Vocal→MIDI. Without one, the sidecar falls back to CPU.
 
-## Building
-
 ### 1. Clone
 
 ```powershell
-git clone https://github.com/<your-username>/SingingPracticeTool.git
+git clone https://github.com/VanKyle00/SingingPracticeTool.git
 cd SingingPracticeTool
 ```
 
