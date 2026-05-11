@@ -4,6 +4,8 @@ A desktop app for solo vocal practice: sing along to an instrumental with live
 pitch on a piano roll, run your mic through a VST chain for monitoring, extract
 stems from any song or YouTube URL, and transcribe vocal takes to MIDI.
 
+![Practice tab — live pitch trace, MIDI overlay, VST chain, transport scrubber](resources/practice-tab-demo.gif)
+
 > **Status:** Windows-first. macOS support is planned but not yet implemented
 > (`SidecarProcess` has a stub for the macOS branch; the C++ host is otherwise
 > portable).
