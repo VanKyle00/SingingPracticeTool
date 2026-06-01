@@ -1,8 +1,44 @@
 """yt-dlp download handler."""
+import shutil
+import sys
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from .rpc import Job, Cancelled, send_progress, log
+
+
+def _find_ffmpeg() -> Optional[str]:
+    """Locate the directory containing ffmpeg for yt-dlp's postprocessor.
+
+    The frozen sidecar can be launched with a stale or minimal environment
+    (e.g. the host process started before ffmpeg was installed), so PATH alone
+    is unreliable. Check, in order:
+      1. next to the frozen executable / this package (a bundled ffmpeg),
+      2. PATH,
+      3. the per-user winget install location (Gyan.FFmpeg).
+    Returns the containing directory, or None if ffmpeg can't be found.
+    """
+    # 1. Bundled alongside the executable (see build_sidecar.py packaging).
+    roots = []
+    if getattr(sys, "frozen", False):
+        roots.append(Path(sys.executable).parent)
+    roots.append(Path(__file__).resolve().parent)
+    for root in roots:
+        for exe in (root / "ffmpeg.exe", root / "ffmpeg"):
+            if exe.exists():
+                return str(exe.parent)
+
+    # 2. PATH.
+    found = shutil.which("ffmpeg")
+    if found:
+        return str(Path(found).parent)
+
+    # 3. winget per-user install (Windows).
+    local = Path.home() / "AppData" / "Local" / "Microsoft" / "WinGet" / "Packages"
+    candidates = sorted(local.glob("Gyan.FFmpeg*/ffmpeg-*/bin/ffmpeg.exe"))
+    if candidates:
+        return str(candidates[-1].parent)
+    return None
 
 
 def youtube_download(params: Dict[str, Any], job: Job) -> Dict[str, Any]:
@@ -52,6 +88,12 @@ def youtube_download(params: Dict[str, Any], job: Job) -> Dict[str, Any]:
         # whole playlist. Matches yt-dlp's --no-playlist CLI flag.
         "noplaylist": True,
     }
+
+    ffmpeg_dir = _find_ffmpeg()
+    if ffmpeg_dir:
+        ydl_opts["ffmpeg_location"] = ffmpeg_dir
+    else:
+        log("warning: ffmpeg not found; audio extraction will fail")
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
