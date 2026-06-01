@@ -9,9 +9,9 @@
 ; Output: packaging\windows\out\SingingPracticeTool-Setup-<version>.exe
 
 #define MyAppName       "SingingPracticeTool"
-#define MyAppVersion    "0.1.0"
+#define MyAppVersion    "0.1.1"
 #define MyAppPublisher  "SingingPracticeTool"
-#define MyAppURL        "https://github.com/your-username/SingingPracticeTool"
+#define MyAppURL        "https://github.com/VanKyle00/SingingPracticeTool"
 #define MyAppExeName    "SingingPracticeTool.exe"
 #define StageDir        "stage"
 
