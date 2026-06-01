@@ -6,6 +6,12 @@ from typing import Any, Dict, Optional
 
 from .rpc import Job, Cancelled, send_progress, log
 
+# A real static ffmpeg is tens of MB; a winget/app-execution-alias shim is well
+# under 1 MB. Only trust a *bundled* ffmpeg (one sitting next to the executable)
+# that clears this bar — otherwise a stray shim there would shadow the working
+# PATH/winget fallback. Mirrors MIN_FFMPEG_BYTES in packaging/windows/stage.py.
+_MIN_FFMPEG_BYTES = 20 * 1024 * 1024  # 20 MiB
+
 
 def _find_ffmpeg() -> Optional[str]:
     """Locate the directory containing ffmpeg for yt-dlp's postprocessor.
@@ -19,14 +25,18 @@ def _find_ffmpeg() -> Optional[str]:
     Returns the containing directory, or None if ffmpeg can't be found.
     """
     # 1. Bundled alongside the executable (see build_sidecar.py packaging).
+    #    Size-gated so a shim can't shadow the PATH/winget fallbacks below.
     roots = []
     if getattr(sys, "frozen", False):
         roots.append(Path(sys.executable).parent)
     roots.append(Path(__file__).resolve().parent)
     for root in roots:
         for exe in (root / "ffmpeg.exe", root / "ffmpeg"):
-            if exe.exists():
-                return str(exe.parent)
+            try:
+                if exe.is_file() and exe.stat().st_size >= _MIN_FFMPEG_BYTES:
+                    return str(exe.parent)
+            except OSError:
+                pass
 
     # 2. PATH.
     found = shutil.which("ffmpeg")
